@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+  Paleta "carretera":
+  amarillo placa #F2C200 · asfalto #22272E · gris vía #ECEEEC · blanco · verde veredicto #1F7A4D
+*/
+@layer base {
+  :root {
+    --background: 120 5% 93%;        /* gris vía #ECEEEC */
+    --foreground: 214 15% 16%;       /* asfalto #22272E */
+    --card: 0 0% 100%;
+    --card-foreground: 214 15% 16%;
+    --primary: 214 15% 16%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 120 4% 88%;
+    --secondary-foreground: 214 15% 16%;
+    --muted: 120 4% 88%;
+    --muted-foreground: 214 8% 38%;
+    --accent: 48 100% 47%;           /* amarillo placa #F2C200 */
+    --accent-foreground: 214 15% 16%;
+    --destructive: 2 64% 44%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 120 4% 82%;
+    --input: 120 4% 76%;
+    --ring: 214 15% 16%;
+    --radius: 0.5rem;
+    --plate: 48 100% 47%;
+    --plate-ink: 214 15% 12%;
+    --verdict: 151 59% 30%;          /* #1F7A4D */
+  }
+
+  * { @apply border-border; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-size: 17px;
+    line-height: 1.55;
+  }
+  :focus-visible { @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+}
+
+@layer components {
+  /* La placa colombiana: fondo amarillo, borde negro, letras condensadas. */
+  .plate {
+    @apply relative inline-flex flex-col items-center rounded-[10px] border-[3px] border-plate-ink bg-plate px-5 pb-1.5 pt-2;
+    box-shadow: inset 0 0 0 3px hsl(var(--plate)), inset 0 0 0 5px hsl(var(--plate-ink) / 0.85);
+  }
+  .plate-chars {
+    @apply font-plate font-bold uppercase text-plate-ink;
+    letter-spacing: 0.06em;
+    line-height: 1;
+  }
+  .plate-city {
+    @apply font-plate text-sm font-semibold uppercase tracking-[0.2em] text-plate-ink;
+  }
+
+  @keyframes plate-in {
+    from { transform: translateY(14px) rotate(-2deg); opacity: 0; }
+    to { transform: none; opacity: 1; }
+  }
+  .plate-enter { animation: plate-in 600ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+}

@@ -1,0 +1,45 @@
+# Alternativa a Render: un servidor propio (VPS) con Docker.
+#   1. Copie .env.production.example a .env.production y llénelo.
+#   2. Apunte el dominio (registros A de sucarrousado.com y www) a la IP del servidor.
+#   3. docker compose -f docker-compose.prod.yml up -d --build
+# Caddy saca y renueva solo el certificado HTTPS.
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    env_file: .env.production
+    environment:
+      DATABASE_URL: postgres://cu:${POSTGRES_PASSWORD:?Defina POSTGRES_PASSWORD}@db:5432/carrousado
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: cu
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Defina POSTGRES_PASSWORD}
+      POSTGRES_DB: carrousado
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cu -d carrousado"]
+      interval: 5s
+      retries: 10
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    command: caddy reverse-proxy --from ${SITE_DOMAIN:-sucarrousado.com} --to app:8080
+    volumes:
+      - caddy:/data
+    depends_on:
+      - app
+
+volumes:
+  pgdata:
+  caddy:
